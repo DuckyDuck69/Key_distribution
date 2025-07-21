@@ -7,9 +7,11 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+import * as crypto from "crypto";
+
+
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -24,9 +26,42 @@ import * as logger from "firebase-functions/logger";
 // functions should each use functions.runWith({ maxInstances: 10 }) instead.
 // In the v1 API, each function can only serve one request per container, so
 // this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+
 
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
+
+// Initialize firebase admin
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
+// v2
+export const getKey = functions.https.onCall(
+  async (data: any, context: any) => {
+    // VERIFY AUTHENTICATION
+    const uid = context.auth?.uid ||"testUser123";
+    if (!uid) {
+      throw new functions.https.HttpsError("unauthenticated", "Login required");
+    }
+
+    // 2.CHECK IF USER ALREADY HAS A KEY
+    // get the document from Firestore: /keys/{uid}
+    const docs = await admin.firestore().collection("keys").doc(uid).get();
+    if (docs.exists) {
+      return docs.data(); // return an object {}
+    }
+
+    // 3. GENERATE A NEW KEY IF NOT EXIST
+    else {
+      const newKey = crypto.randomBytes(16).toString("hex");
+      await admin.firestore().collection("keys").doc(uid).set({
+        key: newKey,
+        createdAt: Date.now(),
+      });
+      return {key: newKey, createdAt: Date.now()};
+    }
+  }
+);
