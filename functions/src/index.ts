@@ -10,7 +10,7 @@
 import * as admin from "firebase-admin";
 import * as crypto from "crypto";
 
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+import {onCall, HttpsError} from "firebase-functions/v2/https";
 //const {logger} = require("firebase-functions/v2");
 
 
@@ -47,20 +47,20 @@ export const getKey = onCall(
     if (!uid) {
       throw new HttpsError("unauthenticated", "Login required");
     }
-
-    // 2.CHECK IF USER ALREADY HAS A KEY
+    
+    //CHECK IF USER ALREADY HAS A KEY
     // get the document from Firestore: /keys/{uid}
     const docs = await admin.firestore().collection("keys").doc(uid).get();
     if (docs.exists) {
       return docs.data(); // return an object {}
     }
 
-    // 3. GENERATE A NEW KEY IF NOT EXIST
+    //GENERATE A NEW KEY
     else {
       const newKey = crypto.randomBytes(16).toString("hex");
       await admin.firestore().collection("keys").doc(uid).set({
         key: newKey,
-        createdAt: Date.now(), //get the Firebase's server time
+        createdAt: Date.now(), //TODO: get the Firebase's server time
         status: "new_key_created"
       });
       return {key: newKey, status: "new_key_created"};
@@ -69,14 +69,14 @@ export const getKey = onCall(
 );
 
 //TO DO: How many times can user revoke key per day? What if the Firestore write fails? 
-// (Solution: Catch the error and throw a proper HttpsError.)
+// (=> catch the error and throw a proper HttpsError)
 export const revokeKey = onCall(
   async (request:any) =>{
     const uid = request.auth?.uid ||"testUser123";
     if(!uid){
       throw new HttpsError("unauthenticated", "Login required")
     }
-    //check if the user has a key or not
+    //CHECK IF USER ALREADY HAS A KEY
     const docs = await admin.firestore().collection("keys").doc(uid).get();
     if (!docs.exists) { //if the user dont have a key, create new
       const newKey = crypto.randomBytes(16).toString("hex");
@@ -87,7 +87,7 @@ export const revokeKey = onCall(
       });
       return {key: newKey, status: "new_key_created"};
     }
-    //revoke their keys
+    //REVOKE THEIR KEY
     else{
       const revoke = crypto.randomBytes(16).toString("hex");
       await admin.firestore().collection("keys").doc(uid).set({
