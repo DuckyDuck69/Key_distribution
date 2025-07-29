@@ -11,3 +11,17 @@ node_modules/
 
 # DO NOT ignore Rust workspace
 !/rust_backend
+
+# Ignore Rust build artifacts
+/target
+
+# Ignore generated gRPC code (optional if you're generating to a subfolder)
+**/*.rs
+!src/**/*.rs
+
+# Ignore IDE and editor files
+.idea/
+.vscode/
+
+# Optional: Ignore any specific output folders for proto
+OUT_DIR/
