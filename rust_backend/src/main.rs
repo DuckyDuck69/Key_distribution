@@ -1,4 +1,4 @@
-use std::collections::{HashMap};
+use std::collections::{HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 
 #[derive(Debug, Clone)]
@@ -14,11 +14,20 @@ impl KVEntry {
     
 }
 
+//must be pascal case in enum and struct
+#[derive(Debug, Clone)]
+enum FunctionCode {   //enum: a type that can be one or several variant
+    Put {key: String, entry: KVEntry},
+    Get {key: String},
+    Print,
+}
+
 #[derive(Debug, Clone)]
 struct NodeState{
     node_id: String,
     store: Arc<Mutex<HashMap<String, KVEntry>>>,  //thread-safe share
     peer_nodes: Vec<String>,
+    command_queue: Arc<Mutex<VecDeque<FunctionCode>>>,
 }
 
 impl NodeState {
@@ -40,6 +49,37 @@ impl NodeState {
             println!("key is {:?}", key);
             println!("entry is {:?}", entry);
         } 
+    }
+    fn handle_command(&self, cmd: FunctionCode){
+        match cmd {
+            FunctionCode::Get { key } => {
+                match self.get(&key){
+                    Some(entry) => println!("Found: {:?}", key),
+                    None => println!("Can't find the key!"),
+                }
+            },
+            FunctionCode::Put { key, entry } => {
+                self.put(key, entry);
+                println!("Node now contains: \n");
+                self.print_store();
+            },
+            FunctionCode::Print =>{
+                self.print_store();
+            }   
+        };
+    }
+    fn enque_command(&self, cmd:FunctionCode){
+        self.command_queue.lock().unwrap().push_back(cmd);
+    }
+    fn deque_command(&self) -> Option<FunctionCode>{  //return Option<> because Rust is type safe and handle None/Null 
+        self.command_queue.lock().unwrap().pop_front()
+    }
+    fn execute_queue_command(&self){
+        //why we can still pull a cmd, handle it
+        // the command below is equal to "while queue: cmd = queue.pop(0)" in Python
+        while let Some(cmd) = self.deque_command(){
+            self.handle_command(cmd);
+        }
     }
 }
 
@@ -66,29 +106,21 @@ fn main(){
         origin_node: "node-3".to_string(),
     };
 
-    let node_state_1 = NodeState {
-        node_id: "node_1".to_string(),
-        //create empty map, wrap it in Mutex to legally mutate data, 
-        //and wrap in Arc (smart pointer for multi ownership) for multi thread
-        store: Arc::new(Mutex::new(HashMap::new())), 
-        peer_nodes: vec!["node_2".to_string()],
+    let node1 = NodeState{
+        node_id: "node1".to_string(),
+        store: Arc::new(Mutex::new(HashMap::new())),  
+        peer_nodes: Vec::new(),
+        command_queue: Arc::new(Mutex::new(VecDeque::new())),
     };
-    let node_state_2 = NodeState {
-        node_id: "node_2".to_string(),
-        store: Arc::new(Mutex::new(HashMap::new())), 
-        peer_nodes: vec!["node_1".to_string(), "node_3".to_string()],
-    };
-    let node_state_3 = NodeState {
-        node_id: "node_3".to_string(),
-        store: Arc::new(Mutex::new(HashMap::new())), 
-        peer_nodes: vec!["node_2".to_string()],
-    };
+    let command = vec![
+        FunctionCode::Put { key: "k1".to_string(), entry: KVEntry_1 },
+        FunctionCode::Get { key: "k1".to_string() },
+        FunctionCode::Print,
+    ];
 
-    node_state_1.put("k1".to_string(), KVEntry_1);
-    node_state_2.put("k2".to_string(), KVEntry_2);
-    node_state_3.put("k3".to_string(), KVEntry_3);
-    node_state_1.print_store();
-    node_state_2.print_store();
-    node_state_3.print_store();
+    for cmd in command{
+        node1.enque_command(cmd);
+    }
+    node1.execute_queue_command();
 
 }
