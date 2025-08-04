@@ -84,43 +84,43 @@ impl NodeState {
 }
 
 fn main(){
-    let KVEntry_1 = KVEntry {
+    let knentry_1 = KVEntry {
         owner_name : "Duc".to_string(),
         value: "hello".to_string(),
         version: 1,
         timestamp: 12345678,
         origin_node: "node-1".to_string(),
     };
-    let KVEntry_2 = KVEntry {
+    let kventry_2 = KVEntry {
         owner_name : "My".to_string(),
         value: "bonsoir".to_string(),
         version: 2,
         timestamp: 12345679,
         origin_node: "node-2".to_string(),
     };
-    let KVEntry_3 = KVEntry {
-        owner_name : "Bao".to_string(),
-        value: "mary-chan".to_string(),
+    let kventry_3 = KVEntry {
+        owner_name : "Mary-chan".to_string(),
+        value: "Haiiiii".to_string(),
         version: 1,
         timestamp: 12345670,
         origin_node: "node-3".to_string(),
     };
 
-    let node1 = NodeState{
-        node_id: "node1".to_string(),
+    let node_1 = NodeState{
+        node_id: "node_1".to_string(),
         store: Arc::new(Mutex::new(HashMap::new())),  
         peer_nodes: Vec::new(),
         command_queue: Arc::new(Mutex::new(VecDeque::new())),
     };
     let command = vec![
-        FunctionCode::Put { key: "k1".to_string(), entry: KVEntry_1 },
+        FunctionCode::Put { key: "k1".to_string(), entry: knentry_1 },
         FunctionCode::Get { key: "k1".to_string() },
         FunctionCode::Print,
     ];
 
     for cmd in command{
-        node1.enque_command(cmd);
+        node_1.enque_command(cmd);
     }
-    node1.execute_queue_command();
+    node_1.execute_queue_command();
 
 }

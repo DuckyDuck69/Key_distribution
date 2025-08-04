@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+service KVStore{
+    rpc Put(PutRequest) returns (GenericResponse);
+    rpc Get(GetRequest) returns (GenericResponse);
+    rpc Print(PrintRequest) returns (GenericResponse);
+}
+
+message KVEntry {
+    string owner_name = 1;
+    string value = 2;
+    uint64 version = 3;
+    uint64 timestamp = 4;
+    string origin_node = 5;
+}
+
+message PutRequest {
+    string key = 1;
+    KVEntry entry = 2;  //it is a KVEntry type 
+}
+
+message GetRequest {
+    string key = 1;
+}
+
+message PrintRequest {
+
+}
+
+message GenericResponse {
+    string message = 1;
+}
