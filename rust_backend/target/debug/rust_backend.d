@@ -1,1 +1,0 @@
-E:\Key-distribution\rust_backend\target\debug\rust_backend.exe: E:\Key-distribution\rust_backend\../proto E:\Key-distribution\rust_backend\../proto/kvstore.proto E:\Key-distribution\rust_backend\build.rs E:\Key-distribution\rust_backend\src\main.rs
