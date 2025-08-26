@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["tower_http",[["impl&lt;S, M, MakeSpan, OnRequest, OnResponse, OnBodyChunk, OnEos, OnFailure&gt; <a class=\"trait\" href=\"tower_layer/trait.Layer.html\" title=\"trait tower_layer::Layer\">Layer</a>&lt;S&gt; for <a class=\"struct\" href=\"tower_http/trace/struct.TraceLayer.html\" title=\"struct tower_http::trace::TraceLayer\">TraceLayer</a>&lt;M, MakeSpan, OnRequest, OnResponse, OnBodyChunk, OnEos, OnFailure&gt;<div class=\"where\">where\n    M: <a class=\"trait\" href=\"https://doc.rust-lang.org/1.88.0/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a>,\n    MakeSpan: <a class=\"trait\" href=\"https://doc.rust-lang.org/1.88.0/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a>,\n    OnRequest: <a class=\"trait\" href=\"https://doc.rust-lang.org/1.88.0/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a>,\n    OnResponse: <a class=\"trait\" href=\"https://doc.rust-lang.org/1.88.0/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a>,\n    OnEos: <a class=\"trait\" href=\"https://doc.rust-lang.org/1.88.0/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a>,\n    OnBodyChunk: <a class=\"trait\" href=\"https://doc.rust-lang.org/1.88.0/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a>,\n    OnFailure: <a class=\"trait\" href=\"https://doc.rust-lang.org/1.88.0/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a>,</div>"]]],["tower_layer",[]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1499,19]}

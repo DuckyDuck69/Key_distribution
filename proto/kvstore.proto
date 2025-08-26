@@ -1,15 +1,16 @@
 syntax = "proto3";
+package kvstore;
 
 service KVStore{
-    rpc Put(PutRequest) returns (GenericResponse);
-    rpc Get(GetRequest) returns (GenericResponse);
-    rpc Print(PrintRequest) returns (GenericResponse);
+    rpc Put(PutRequest) returns (PutReply);
+    rpc Get(GetRequest) returns (GetReply);
+    rpc Delete(DeleteRequest) returns (DeleteReply);
 }
 
 message KVEntry {
     string owner_name = 1;
-    string value = 2;
-    uint64 version = 3;
+    bytes value = 2;
+    uint64 version = 3; 
     uint64 timestamp = 4;
     string origin_node = 5;
 }
@@ -17,16 +18,27 @@ message KVEntry {
 message PutRequest {
     string key = 1;
     KVEntry entry = 2;  //it is a KVEntry type 
+    bytes value = 3;
 }
 
 message GetRequest {
     string key = 1;
 }
 
-message PrintRequest {
-
+message DeleteRequest {
+    string key = 1;
 }
 
-message GenericResponse {
-    string message = 1;
+message GetReply {
+    bool found = 1;
+    bytes val = 2;
 }
+
+message PutReply{
+    bool put = 1;
+}
+
+message DeleteReply{
+    bool deleted = 1;
+}
+

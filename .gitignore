@@ -1,3 +1,11 @@
+# Rust build artifacts
+/target
+**/*.rlib
+**/*.rmeta
+
+Makefile*
+
+
 # Logs
 logs
 *.log

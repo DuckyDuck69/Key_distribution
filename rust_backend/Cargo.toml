@@ -7,6 +7,10 @@ edition = "2024"
 tonic = {version = "0.11", features = ["transport"]}
 prost = "0.12"
 tokio = {version = "1.37", features = ["full"]}
+#observatory
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tower-http = { version = "0.5", features = ["trace"] }
 
 [build-dependencies]
 tonic-build = "0.11"
