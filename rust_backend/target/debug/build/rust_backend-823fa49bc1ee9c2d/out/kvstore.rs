@@ -4,8 +4,8 @@
 pub struct KvEntry {
     #[prost(string, tag = "1")]
     pub owner_name: ::prost::alloc::string::String,
-    #[prost(string, tag = "2")]
-    pub value: ::prost::alloc::string::String,
+    #[prost(bytes = "vec", tag = "2")]
+    pub value: ::prost::alloc::vec::Vec<u8>,
     #[prost(uint64, tag = "3")]
     pub version: u64,
     #[prost(uint64, tag = "4")]
@@ -21,6 +21,8 @@ pub struct PutRequest {
     /// it is a KVEntry type
     #[prost(message, optional, tag = "2")]
     pub entry: ::core::option::Option<KvEntry>,
+    #[prost(bytes = "vec", tag = "3")]
+    pub value: ::prost::alloc::vec::Vec<u8>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -30,12 +32,29 @@ pub struct GetRequest {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PrintRequest {}
+pub struct DeleteRequest {
+    #[prost(string, tag = "1")]
+    pub key: ::prost::alloc::string::String,
+}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GenericResponse {
-    #[prost(string, tag = "1")]
-    pub message: ::prost::alloc::string::String,
+pub struct GetReply {
+    #[prost(bool, tag = "1")]
+    pub found: bool,
+    #[prost(bytes = "vec", tag = "2")]
+    pub val: ::prost::alloc::vec::Vec<u8>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PutReply {
+    #[prost(bool, tag = "1")]
+    pub put: bool,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteReply {
+    #[prost(bool, tag = "1")]
+    pub deleted: bool,
 }
 /// Generated client implementations.
 pub mod kv_store_client {
@@ -125,10 +144,7 @@ pub mod kv_store_client {
         pub async fn put(
             &mut self,
             request: impl tonic::IntoRequest<super::PutRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GenericResponse>,
-            tonic::Status,
-        > {
+        ) -> std::result::Result<tonic::Response<super::PutReply>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -147,10 +163,7 @@ pub mod kv_store_client {
         pub async fn get(
             &mut self,
             request: impl tonic::IntoRequest<super::GetRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GenericResponse>,
-            tonic::Status,
-        > {
+        ) -> std::result::Result<tonic::Response<super::GetReply>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -166,13 +179,10 @@ pub mod kv_store_client {
             req.extensions_mut().insert(GrpcMethod::new("kvstore.KVStore", "Get"));
             self.inner.unary(req, path, codec).await
         }
-        pub async fn print(
+        pub async fn delete(
             &mut self,
-            request: impl tonic::IntoRequest<super::PrintRequest>,
-        ) -> std::result::Result<
-            tonic::Response<super::GenericResponse>,
-            tonic::Status,
-        > {
+            request: impl tonic::IntoRequest<super::DeleteRequest>,
+        ) -> std::result::Result<tonic::Response<super::DeleteReply>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -183,9 +193,9 @@ pub mod kv_store_client {
                     )
                 })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static("/kvstore.KVStore/Print");
+            let path = http::uri::PathAndQuery::from_static("/kvstore.KVStore/Delete");
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new("kvstore.KVStore", "Print"));
+            req.extensions_mut().insert(GrpcMethod::new("kvstore.KVStore", "Delete"));
             self.inner.unary(req, path, codec).await
         }
     }
@@ -200,15 +210,15 @@ pub mod kv_store_server {
         async fn put(
             &self,
             request: tonic::Request<super::PutRequest>,
-        ) -> std::result::Result<tonic::Response<super::GenericResponse>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::PutReply>, tonic::Status>;
         async fn get(
             &self,
             request: tonic::Request<super::GetRequest>,
-        ) -> std::result::Result<tonic::Response<super::GenericResponse>, tonic::Status>;
-        async fn print(
+        ) -> std::result::Result<tonic::Response<super::GetReply>, tonic::Status>;
+        async fn delete(
             &self,
-            request: tonic::Request<super::PrintRequest>,
-        ) -> std::result::Result<tonic::Response<super::GenericResponse>, tonic::Status>;
+            request: tonic::Request<super::DeleteRequest>,
+        ) -> std::result::Result<tonic::Response<super::DeleteReply>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct KvStoreServer<T: KvStore> {
@@ -294,7 +304,7 @@ pub mod kv_store_server {
                     struct PutSvc<T: KvStore>(pub Arc<T>);
                     impl<T: KvStore> tonic::server::UnaryService<super::PutRequest>
                     for PutSvc<T> {
-                        type Response = super::GenericResponse;
+                        type Response = super::PutReply;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -338,7 +348,7 @@ pub mod kv_store_server {
                     struct GetSvc<T: KvStore>(pub Arc<T>);
                     impl<T: KvStore> tonic::server::UnaryService<super::GetRequest>
                     for GetSvc<T> {
-                        type Response = super::GenericResponse;
+                        type Response = super::GetReply;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -377,23 +387,23 @@ pub mod kv_store_server {
                     };
                     Box::pin(fut)
                 }
-                "/kvstore.KVStore/Print" => {
+                "/kvstore.KVStore/Delete" => {
                     #[allow(non_camel_case_types)]
-                    struct PrintSvc<T: KvStore>(pub Arc<T>);
-                    impl<T: KvStore> tonic::server::UnaryService<super::PrintRequest>
-                    for PrintSvc<T> {
-                        type Response = super::GenericResponse;
+                    struct DeleteSvc<T: KvStore>(pub Arc<T>);
+                    impl<T: KvStore> tonic::server::UnaryService<super::DeleteRequest>
+                    for DeleteSvc<T> {
+                        type Response = super::DeleteReply;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::PrintRequest>,
+                            request: tonic::Request<super::DeleteRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as KvStore>::print(&inner, request).await
+                                <T as KvStore>::delete(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -405,7 +415,7 @@ pub mod kv_store_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = PrintSvc(inner);
+                        let method = DeleteSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

@@ -1,0 +1,2 @@
+impl tower::Layer<http::Request<{type error}>> + Clone: tower::Layer<Routes>
+Stack<impl tower::Layer<http::Request<{type error}>> + Clone, tower::layer::util::Identity>
