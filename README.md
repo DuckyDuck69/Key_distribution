@@ -1,14 +1,12 @@
-# Key Distribution System (Rust + gRPC + AWS EC2)
+# Key Distribution System (Rust + gRPC)
 
-A distributed key–value store written in Rust, using gRPC for RPCs and Raft for replication (library-based). Targets 5–10 nodes in a single AWS AZ.
+A single-node key–value store written in Rust, using gRPC for RPCs. Future work will extend to persistence and Raft-based clustering.
 
-## Goals & Scope (Sprint)
-- Cluster size: 5–10 nodes (single AZ)
-- Workload: small values ≤ 1 KB, ~70/30 read/write
-- SLA: p95 latency < 50 ms (same-AZ client), “thousands req/s”
-- Durability: follower crash → auto-rejoin; no acknowledged-write loss
-- Consistency: linearizable reads after write ACK (leader/read-index)
-- Out of scope: multi-region, ACLs/tenancy, transactions
+## Goals & Scope
+- Current: in-memory KV store with `Put`, `Get`, `Delete`
+- Observability: structured logs with op/key/status/latency
+- Error policy: invalid_argument (empty key), found/not_found for Get/Delete
+- Next: sled persistence → Raft replication → AWS EC2 deployment
 
 ## Repo Structure
 - `proto/kvstore.proto` — gRPC definitions
@@ -16,13 +14,19 @@ A distributed key–value store written in Rust, using gRPC for RPCs and Raft fo
   - `build.rs` — proto codegen
   - `src/`
     - `lib.rs`
-    - `kv/` — in-mem store and traits
+    - `kv/` — in-memory store
     - `rpc/` — gRPC service impl
-    - `cluster/` — node config/ids
-- `docs/` — goals, runbooks, results
+    - `main.rs` — server entrypoint
+    - `bin/client.rs` — Rust client for smoke tests
 
-## Local Dev (single node)
-```bash
+## Local Dev
+```powershell
 cd rust_backend
 cargo build
-RUST_LOG=info ./target/debug/rust_backend --node-id=node-1 --grpc-port=50051
+
+# Run server
+$env:RUST_LOG="info"
+.\target\debug\rust_backend.exe --node-id=node-1 --grpc-port=50051
+
+# Run client (new window)
+cargo run --bin client

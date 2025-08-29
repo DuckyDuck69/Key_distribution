@@ -30,8 +30,8 @@ async fn main() -> anyhow::Result<()> {
     println!("Get: {:?}", client.get(get).await?);
 
     // DELETE
-    let del = DeleteRequest { key: "k1".into() };
-    println!("Delete: {:?}", client.delete(del).await?);
+    // let del = DeleteRequest { key: "k1".into() };
+    // println!("Delete: {:?}", client.delete(del).await?);
 
     // GET 
     let get2 = GetRequest { key: "k1".into() };

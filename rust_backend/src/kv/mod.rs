@@ -1,34 +1,34 @@
 
 
-use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
 
-pub type SharedStore = Arc<RwLock<HashMap<String, Vec<u8>>>>;
+use sled::Db;
 
+
+#[derive(Clone)]
 pub struct InMemoryStore{
-    pub inner: SharedStore,
+    db: Db,
 }
 
 impl InMemoryStore{
-    pub fn new() -> Self{
-        Self { inner: Arc::new(RwLock::new(HashMap::new()))}
+    pub fn new(db: Db) -> Self{
+        Self { db }
     }
     
     ////Read path: many readers can hold the lock concurrently
-    pub fn get(&self, key: &str) -> Option<Vec<u8>> {
-        let map = self.inner.read().unwrap(); //get read lock
-        map.get(key).cloned()   //clone bytes to return ownershup
+    pub fn get(&self, key: &str) ->  Result<Option<Vec<u8>>, sled::Error> {
+        self.db.get(key.as_bytes()) //sled stores as raw u8 bytes//flatten Option<Option<>> to Option<>
+            .map(|opt| opt.map(|v|v.to_vec()))  //conver IVect that sled returns to Vec
     }  //end of lock
 
     ////Write path: exclusive writer
-    pub fn put(&self, key: &str, val: Vec<u8>) -> bool{
-        let mut map = self.inner.write().unwrap();  //get write lock
-        map.insert(key.to_string(), val).is_some() //is_some return true if replaced succeed
+    pub fn put(&self, key: &str, val: Vec<u8>) -> Result<bool, sled::Error>{
+        self.db.insert(key.as_bytes(), val)
+                .map(|opt| opt.is_some()) //return true if new value, false if exists/error
     }
 
-    pub fn delete(&self, key:&str) -> bool {
-        let mut map = self.inner.write().unwrap();
-        map.remove(key).is_some()  //is_some return true if a key exist
+    pub fn delete(&self, key:&str) -> Result<bool, sled::Error> {
+        self.db.remove(key.as_bytes())
+                .map(|opt| opt.is_some()) 
     }
 
 }
