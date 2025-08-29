@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tonic = {version = "0.11", features = ["transport"]}
-prost = "0.12"
+tonic = {version = "0.12", features = ["transport"]}
+prost = "0.13"
+prost-types  = "0.13"
 tokio = {version = "1.37", features = ["full"]}
 #observatory
 tracing = "0.1"
@@ -13,8 +14,11 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json",
 time = "0.3"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["trace"] }  #Tracelayer
-http = "0.2"
-hyper = "1.7.0"
+http = "1"
+http-body = "1"
+hyper        = { version = "1", features = ["http1", "http2", "server"] }
+anyhow = "1"
+
 
 [build-dependencies]
-tonic-build = "0.11"
+tonic-build = "0.12"

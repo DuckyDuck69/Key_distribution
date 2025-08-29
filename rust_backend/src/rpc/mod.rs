@@ -30,13 +30,18 @@ use crate::kv::InMemoryStore;
 use crate::kvstore;
 //Generated types
 use crate::kvstore::{
-    kv_store_server:: {KvStore, KvStoreServer},
     PutRequest, PutReply, GetRequest, GetReply, DeleteRequest, DeleteReply
 };
 
 pub struct KvService {
     pub node_id: String,
     pub store: InMemoryStore,
+}
+
+impl KvService{
+    pub fn new(node_id: String, store: InMemoryStore) -> Self{
+        Self {node_id, store}
+    }
 }
 
 #[tonic::async_trait]
@@ -71,6 +76,6 @@ impl kvstore::kv_store_server::KvStore for KvService{
     async fn delete(&self, req: Request<DeleteRequest>) ->  Result<tonic::Response<DeleteReply>, tonic::Status>{
         let key = req.into_inner().key;
         let deleted = self.store.delete(&key);
-        Ok(Response::new(DeleteReply {deleted: true}))
+        Ok(Response::new(DeleteReply {deleted}))
     }
 }

@@ -1,0 +1,1 @@
+{"rustc":1842507548689473721,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[14256054179159413469,"build_script_build",false,16262118107001415758]],"local":[{"RerunIfChanged":{"output":"debug\\build\\rust_backend-d6896939fb6af700\\output","paths":["../proto/kvstore.proto","../proto"]}}],"rustflags":[],"config":0,"compile_kind":0}

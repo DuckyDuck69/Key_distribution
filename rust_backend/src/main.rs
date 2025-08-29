@@ -23,25 +23,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>>{
     telemetry::init();
 
     // TODO: parse args or set defaults:
-    // let node_id = "node-1".to_string();
-    // let port = 50051;  //typical port for testing
+    let node_id = "node-1".to_string();
+    let port = 50051;  //typical port for testing
 
     //convert the string into SocketAddr, if fails return error
-    let addr: SocketAddr = format!("127.0.0.1", port).parse()?;
+    let addr: SocketAddr = format!("127.0.0.1:{port}").parse()?;
     
     let svc = KvService::new(node_id, InMemoryStore::new());
 
     Server::builder()  //start the Tonic server 
         .layer(
             telemetry::grpc_layer() //attach a tower Layer (middleware) to the server 
-                    .make_span_with(|req: &Request<_>| {
+                    .make_span_with(|req: &Request<_>| {   //create a tracing span 
                 info_span!(
                     "grpc_request",
                     method = %req.method(),
                     path   = %req.uri().path(),
                 )
             })
-            .on_response(
+            .on_response(   //run when the response finishes
                 DefaultOnResponse::new()
                     .level(Level::INFO)
                     .latency_unit(LatencyUnit::Millis),
