@@ -70,9 +70,13 @@ impl kvstore::kv_store_server::KvStore for KvService{
 
         //return the new status as a response
         match replaced{
-            Ok(replaced) => {
-                info!(op="put", key=%key, status="ok", latency_ms=%latency);
+            Ok(true) => {
+                info!(op="put", key=%key, status="inserted key", latency_ms=%latency);
                 Ok(Response::new(PutReply { put: true }))
+            }
+            Ok(false) =>{
+                info!(op="put", key=%key, status="failed to insert key", latency_ms=%latency);
+                Ok(Response::new(PutReply { put: false }))
             }
             Err(e) => {
                 info!(op="put", key=%key, status="db_error", error=%e.to_string(), latency_ms=%latency);

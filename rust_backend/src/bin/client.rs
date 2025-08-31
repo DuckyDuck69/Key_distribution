@@ -15,13 +15,13 @@ use rust_backend::kvstore::{PutRequest, GetRequest, DeleteRequest};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {   
-    let mut client = KvStoreClient::connect("http://127.0.0.1:50051").await?;
+    let mut client = KvStoreClient::connect("http://13.236.5.1:50051").await?;
 
     // PUT
     let put = PutRequest {
         //key: String::from("k1")   ->alternative way to write 
         key: "k1".into(),   //into convert covert one type to another, in this case &str to String   
-        value: b"hello".to_vec(),
+        value: b"this key is from -$(date +%s)".to_vec(), //the b means "make this a byte string    "
     };
     println!("Put: {:?}", client.put(put).await?);
 
@@ -29,9 +29,9 @@ async fn main() -> anyhow::Result<()> {
     let get = GetRequest { key: "k1".into() };
     println!("Get: {:?}", client.get(get).await?);
 
-    // DELETE
-    // let del = DeleteRequest { key: "k1".into() };
-    // println!("Delete: {:?}", client.delete(del).await?);
+    //DELETE
+    let del = DeleteRequest { key: "k1".into() };
+    println!("Delete: {:?}", client.delete(del).await?);
 
     // GET 
     let get2 = GetRequest { key: "k1".into() };

@@ -16,7 +16,7 @@ impl InMemoryStore{
     
     ////Read path: many readers can hold the lock concurrently
     pub fn get(&self, key: &str) ->  Result<Option<Vec<u8>>, sled::Error> {
-        self.db.get(key.as_bytes()) //sled stores as raw u8 bytes//flatten Option<Option<>> to Option<>
+        self.db.get(key.as_bytes()) //sled stores as raw u8 bytes
             .map(|opt| opt.map(|v|v.to_vec()))  //conver IVect that sled returns to Vec
     }  //end of lock
 
