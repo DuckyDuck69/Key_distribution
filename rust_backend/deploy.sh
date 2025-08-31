@@ -20,7 +20,7 @@ else
 fi
 
 echo "[*] Starting new instance in background..."
-nohup "$BINARY_PATH" > "$REPO_DIR/server.log" 2>&1 &
+#nohup "$BINARY_PATH" > "$REPO_DIR/server.log" 2>&1 &
 
 echo "[*] Deployment complete. Tail logs with:"
 echo "    tail -f $REPO_DIR/server.log"
