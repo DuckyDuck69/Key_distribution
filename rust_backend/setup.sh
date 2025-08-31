@@ -12,6 +12,8 @@ if [[ "${ID}" == "ubuntu" || "${ID_LIKE}" == *"debian"* ]]; then
   sudo apt update
   sudo apt upgrade -y
   sudo apt install -y build-essential pkg-config libssl-dev protobuf-compiler git curl
+  sudo snap install rustup
+  sudo apt  install cargo
 elif [[ "${ID}" == "amzn" || "${ID_LIKE}" == *"rhel"* || "${ID_LIKE}" == *"fedora"* ]]; then
   sudo dnf -y update || true
   sudo dnf groupinstall -y "Development Tools"
