@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_DIR="$HOME/key-distribution/rust_backend"
+REPO_DIR="$HOME/opt/Key-distribution/rust_backend"
 BINARY_PATH="$REPO_DIR/target/release/rust_backend"
 PORT=50051
 
