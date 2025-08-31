@@ -1,2 +1,0 @@
-cargo:rerun-if-changed=../proto/kvstore.proto
-cargo:rerun-if-changed=../proto
